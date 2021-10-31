@@ -1,35 +1,57 @@
-from PyQt5.QtWidgets import QMainWindow
+import sqlite3
+import sys
+
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5 import uic
 
-from user import DEFAULT_IMAGE_FILE, User, Album, Song, AlbumTemplate
+import util
+from database import BlackLandDatabase
+from user import User
 
 
 class AuthWidget(QMainWindow):
+    finished = pyqtSignal(User)
 
-    def __init__(self, db):
+    def __init__(self, database):
         super().__init__()
-        self.db = db
+        self.database = database
         uic.loadUi('ui/auth.ui', self)
+        self.initUi()
+
+    def initUi(self):
+        self.login_button.clicked.connect(self.login)
+        self.register_button.clicked.connect(self.register)
 
     def register(self):
         username = self.login_input.text()
-        if self.db.account_exists(username):
+        if self.database.account_exists(username):
             self.statusBar().showMessage("Аккаунт с таким именем уже существует!")
             return
         password = self.password_input.text()
-        self.db.create_account(username, password)
+        self.database.create_account(User(util.random_id(), username, password, "", list()))
         self.finish()
 
     def login(self):
         username = self.login_input.text()
         password = self.password_input.text()
-        if not self.db.check_password(username, password):
+        if not self.database.check_password(username, password):
             self.statusBar().showMessage("Неверный логин или пароль")
             return
         self.finish()
 
     def finish(self):
-        self.load_user(self.login_input().text())
+        self.finished.emit(self.database.load_user(self.login_input.text()))
 
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    connection = sqlite3.connect("blackland.db")
+    db = BlackLandDatabase(connection)
+    db.initialize()
+    ex = AuthWidget(db)
+    ex.show()
+    ex.finished.connect()
+    sys.exit(app.exec())
 
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>583</width>
     <height>744</height>
    </rect>
   </property>
@@ -17,9 +17,9 @@
    <widget class="QLabel" name="logo">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>30</y>
-      <width>371</width>
+      <x>90</x>
+      <y>140</y>
+      <width>361</width>
       <height>61</height>
      </rect>
     </property>
@@ -39,9 +39,9 @@
    <widget class="QScrollArea" name="scroll">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>280</y>
-      <width>701</width>
+      <x>20</x>
+      <y>330</y>
+      <width>530</width>
       <height>391</height>
      </rect>
     </property>
@@ -53,7 +53,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>697</width>
+       <width>526</width>
        <height>387</height>
       </rect>
      </property>
@@ -67,8 +67,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>230</y>
+      <x>30</x>
+      <y>270</y>
       <width>241</width>
       <height>31</height>
      </rect>
@@ -87,8 +87,8 @@
    <widget class="QLabel" name="account_label">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>30</y>
+      <x>20</x>
+      <y>20</y>
       <width>161</width>
       <height>18</height>
      </rect>
@@ -100,11 +100,18 @@
    <widget class="QLabel" name="account_value">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>50</y>
+      <x>20</x>
+      <y>40</y>
       <width>161</width>
       <height>18</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="text">
      <string>accountname</string>
@@ -114,7 +121,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>80</y>
+      <y>70</y>
       <width>121</width>
       <height>34</height>
      </rect>
@@ -126,14 +133,27 @@
    <widget class="QPushButton" name="add_album_button">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>130</y>
+      <x>280</x>
+      <y>270</y>
       <width>121</width>
       <height>34</height>
      </rect>
     </property>
     <property name="text">
      <string>Добавить альбом</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="update_button">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>270</y>
+      <width>131</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Обновить</string>
     </property>
    </widget>
   </widget>

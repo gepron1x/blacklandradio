@@ -1,4 +1,7 @@
-from user import AlbumTemplate, Song, Album
+import shutil
+
+from main import ALBUMS_FOLDER
+from user import AlbumTemplate, Song, Album, User, Genre, DEFAULT_IMAGE_FILE
 
 
 class BlackLandDatabase:
@@ -13,7 +16,7 @@ class BlackLandDatabase:
                     "password VARCHAR(60) NOT NULL,"
                     "description TINYTEXT,"
                     "avatar TINYTEXT,"
-                    "PRIMARY KEY(id AUTOINCREMENT)"
+                    "PRIMARY KEY(id)"
                     ")")
         cur.execute("CREATE TABLE IF NOT EXISTS albums ("
                     "id INTEGER NOT NULL,"
@@ -22,19 +25,19 @@ class BlackLandDatabase:
                     "genre INTEGER NOT NULL,"
                     "year  INTEGER NOT NULL,"
                     "cover TINYTEXT,"
-                    "PRIMARY KEY(id AUTOINCREMENT)"
+                    "PRIMARY KEY(id)"
                     ")"
                     )
         cur.execute("CREATE TABLE IF NOT EXISTS songs ("
                     "id INTEGER NOT NULL,"
                     "album_id INTEGER NOT NULL,"
                     "name VARCHAR(60),"
-                    "PRIMARY KEY(id AUTOINCREMENT)"
+                    "PRIMARY KEY(id)"
                     ")")
         cur.execute("CREATE TABLE IF NOT EXISTS genres ("
                     "id INTEGER NOT NULL,"
                     "name VARCHAR(60) NOT NULL,"
-                    "PRIMARY KEY(id AUTOINCREMENT)"
+                    "PRIMARY KEY(id)"
                     ")")
         self.connection.commit()
 
@@ -43,10 +46,11 @@ class BlackLandDatabase:
         rs = cur.execute("SELECT * FROM users WHERE username=?", (username,)).fetchall()
         return len(rs) != 0
 
-    def create_account(self, username, password):
+    def create_account(self, user):
         cur = self.connection.cursor()
-        cur.execute("INSERT INTO users(username, password, description, avatar) VALUES (?, ?, ?, ?)",
-                    (username, password, "", DEFAULT_IMAGE_FILE))
+        cur.execute("INSERT INTO users(id, username, password, description, avatar) VALUES (?, ?, ?, ?, ?)",
+                    (user.get_id(), user.get_username(), user.get_password(),
+                     user.get_description(), user.get_avatar()))
         self.connection.commit()
 
     def check_password(self, username, password):
@@ -60,8 +64,8 @@ class BlackLandDatabase:
                          "A.id, A.name, A.genre, A.year, A.cover, "
                          "S.id, S.name "
                          "FROM users as U "
-                         "JOIN albums as A ON U.id = A.user_id "
-                         "JOIN songs as S ON A.id = S.album_id WHERE U.username=?",
+                         "LEFT JOIN albums as A ON U.id = A.user_id "
+                         "LEFT JOIN songs as S ON A.id = S.album_id WHERE U.username=?",
                          (username,)).fetchall()
         print(rs)
         first = rs[0]
@@ -91,26 +95,82 @@ class BlackLandDatabase:
     def load_album_templates(self):
         cur = self.connection.cursor()
         results = cur.execute("SELECT A.id, U.username, A.name, A.year, A.cover "
-                              "FROM albums as A JOIN users AS U ON A.user_id = U.id")
+                              "FROM albums as A JOIN users AS U ON A.user_id = U.id").fetchall()
+        print(results)
         return list(map(lambda r: AlbumTemplate(r[0], r[1], r[2], r[3], r[4]), results))
 
     def load_album(self, album_id):
         cur = self.connection.cursor()
-        results = cur.execute("SELECT A.name, A.genre, A.year, A.cover, S.id, S.name "
-                              "FROM albums AS A JOIN songs AS S ON A.id = S.album_id WHERE A.id=?",
+        results = cur.execute("SELECT A.name, A.year, A.cover, G.id, G.name, S.id, S.name "
+                              "FROM albums AS A "
+                              "JOIN songs AS S ON A.id = S.album_id "
+                              "JOIN genres AS G ON A.genre = G.id "
+                              "WHERE A.id=?",
                               (album_id,)).fetchall()
         first = results[0]
         album_name = first[0]
-        album_genre = first[1]
-        album_year = first[2]
-        album_cover = first[3]
+        album_year = first[1]
+        album_cover = first[2]
+        album_genre = Genre(first[3], first[4])
         songs = list()
         for result in results:
-            print(result)
-            song_id = result[4]
-            song_name = result[5]
+            song_id = result[5]
+            song_name = result[6]
             songs.append(Song(song_id, song_name))
         return Album(album_id, album_name, album_genre, album_year, songs, cover=album_cover)
 
+    def save_album(self, user_id, album):
+        cur = self.connection.cursor()
+        album_id = album.get_id()
+        cur.execute("INSERT INTO albums (id, user_id, name, genre, year, cover) VALUES(?, ?, ?, ?, ?, ?)",
+                    (album_id, user_id, album.get_name(),
+                     album.get_genre().get_id(), album.get_year(), album.get_cover()))
+        cur.executemany("INSERT INTO songs (id, album_id, name) VALUES (?, ?, ?)",
+                        list(map(lambda s: (s.get_id(), album_id, s.get_name()), album.get_songs())))
+        self.connection.commit()
+
+    def load_genres(self):
+        cur = self.connection.cursor()
+        return list(map(lambda t: Genre(t[0], t[1]), cur.execute("SELECT * FROM genres").fetchall()))
+
     def shutdown(self):
         self.connection.close()
+
+
+class Editor:
+    def __init__(self, connection):
+        self.connection = connection
+
+    def finish(self):
+        self.connection.commit()
+
+
+class UserEditor(Editor):
+
+    def __init__(self, connection, user):
+        super().__init__(connection)
+        self.albums_to_delete = list()
+        self.user = user
+
+    def set_avatar(self, avatar):
+        cursor = self.connection.cursor()
+        cursor.execute("UPDATE users SET avatar=? WHERE id=?", (avatar, self.user.get_id()))
+
+    def set_description(self, description):
+        cursor = self.connection.cursor()
+        cursor.execute("UPDATE users SET description=? WHERE id=?", (description, self.user.get_id()))
+
+    def remove_album(self, album):
+        self.albums_to_delete.append(album)
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM albums WHERE id=?", (album.get_id(),))
+        cursor.execute("DELETE FROM songs WHERE album_id=?", (album.get_id(),))
+
+    def finish(self):
+        super().finish()
+        for album in self.albums_to_delete:
+            album_folder = ALBUMS_FOLDER + f"album_{album.get_id()}/"
+            shutil.rmtree(album_folder)
+
+
+
