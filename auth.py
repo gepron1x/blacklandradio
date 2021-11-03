@@ -2,11 +2,10 @@ import sqlite3
 import sys
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtWidgets import QMainWindow
 from PyQt5 import uic
 
 import util
-from database import BlackLandDatabase
 from user import User
 
 
@@ -42,16 +41,5 @@ class AuthWidget(QMainWindow):
 
     def finish(self):
         self.finished.emit(self.database.load_user(self.login_input.text()))
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    connection = sqlite3.connect("blackland.db")
-    db = BlackLandDatabase(connection)
-    db.initialize()
-    ex = AuthWidget(db)
-    ex.show()
-    ex.finished.connect()
-    sys.exit(app.exec())
 
 

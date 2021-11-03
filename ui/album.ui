@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>600</height>
+    <height>592</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,8 +29,8 @@
   <widget class="QLabel" name="album_name">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>60</y>
+     <x>340</x>
+     <y>10</y>
      <width>251</width>
      <height>41</height>
     </rect>
@@ -49,8 +49,8 @@
   <widget class="QLabel" name="album_year">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>160</y>
+     <x>440</x>
+     <y>130</y>
      <width>91</width>
      <height>41</height>
     </rect>
@@ -252,8 +252,8 @@
   <widget class="QLabel" name="user_label">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>120</y>
+     <x>340</x>
+     <y>70</y>
      <width>291</width>
      <height>20</height>
     </rect>
@@ -267,6 +267,79 @@
    </property>
    <property name="text">
     <string>*user*</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="profile_button">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>100</y>
+     <width>191</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Профиль пользователя...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="genre_label">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>180</y>
+     <width>58</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Жанр:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="year_label">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>130</y>
+     <width>58</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Год:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="album_genre">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>180</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>*genre*</string>
    </property>
   </widget>
  </widget>

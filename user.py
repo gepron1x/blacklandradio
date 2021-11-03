@@ -45,9 +45,10 @@ class User:
 
 
 class Song:
-    def __init__(self, song_id, name):
+    def __init__(self, song_id, name, file):
         self.song_id = song_id
         self.name = name
+        self.file = file
 
     def get_id(self):
         return self.song_id
@@ -55,12 +56,16 @@ class Song:
     def get_name(self):
         return self.name
 
+    def get_file(self):
+        return self.file
+
     def __str__(self):
         return f"Song {self.name} [" \
-               f"id: {self.song_id}]"
+               f"id: {self.song_id}," \
+               f"file: {self.file}]"
 
     def __hash__(self):
-        return hash((self.song_id, self.name))
+        return hash((self.song_id, self.name, self.file))
 
 
 class Genre:

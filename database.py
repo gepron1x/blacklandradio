@@ -1,6 +1,6 @@
 import shutil
 
-from main import ALBUMS_FOLDER
+
 from user import AlbumTemplate, Song, Album, User, Genre, DEFAULT_IMAGE_FILE
 
 
@@ -32,12 +32,13 @@ class BlackLandDatabase:
                     "id INTEGER NOT NULL,"
                     "album_id INTEGER NOT NULL,"
                     "name VARCHAR(60),"
+                    "file TINYTEXT NOT NULL,"
                     "PRIMARY KEY(id)"
                     ")")
         cur.execute("CREATE TABLE IF NOT EXISTS genres ("
                     "id INTEGER NOT NULL,"
-                    "name VARCHAR(60) NOT NULL,"
-                    "PRIMARY KEY(id)"
+                    "name VARCHAR(60) NOT NULL UNIQUE,"
+                    "PRIMARY KEY(id AUTOINCREMENT)"
                     ")")
         self.connection.commit()
 
@@ -62,12 +63,14 @@ class BlackLandDatabase:
         cur = self.connection.cursor()
         rs = cur.execute("SELECT U.id, U.username, U.password, U.description, U.avatar, "
                          "A.id, A.name, A.genre, A.year, A.cover, "
-                         "S.id, S.name "
+                         "S.id, S.name, S.file "
                          "FROM users as U "
                          "LEFT JOIN albums as A ON U.id = A.user_id "
                          "LEFT JOIN songs as S ON A.id = S.album_id WHERE U.username=?",
                          (username,)).fetchall()
-        print(rs)
+        if len(rs) == 0:
+            return None
+
         first = rs[0]
         user_id = first[0]
         password = first[2]
@@ -75,6 +78,8 @@ class BlackLandDatabase:
         avatar = first[4]
         albums = {}
         for results in rs:
+            if all(map(lambda r: r is None, results[5:12])):  # it seems that user don't have any albums
+                continue
             album_id = results[5]
             album_name = results[6]
             album_genre = results[7]
@@ -83,11 +88,12 @@ class BlackLandDatabase:
 
             song_id = results[10]
             song_name = results[11]
+            song_file = results[12]
 
             album = albums.get(album_id, None)
             if album is None:
                 album = Album(album_id, album_name, album_genre, album_year, list(), cover=album_cover)
-            album.add_song(Song(song_id, song_name))
+            album.add_song(Song(song_id, song_name, song_file))
             albums[album_id] = album
 
         return User(user_id, username, password, description, list(albums.values()), avatar=avatar)
@@ -96,12 +102,11 @@ class BlackLandDatabase:
         cur = self.connection.cursor()
         results = cur.execute("SELECT A.id, U.username, A.name, A.year, A.cover "
                               "FROM albums as A JOIN users AS U ON A.user_id = U.id").fetchall()
-        print(results)
         return list(map(lambda r: AlbumTemplate(r[0], r[1], r[2], r[3], r[4]), results))
 
     def load_album(self, album_id):
         cur = self.connection.cursor()
-        results = cur.execute("SELECT A.name, A.year, A.cover, G.id, G.name, S.id, S.name "
+        results = cur.execute("SELECT A.name, A.year, A.cover, G.id, G.name, S.id, S.name, S.file "
                               "FROM albums AS A "
                               "JOIN songs AS S ON A.id = S.album_id "
                               "JOIN genres AS G ON A.genre = G.id "
@@ -114,9 +119,12 @@ class BlackLandDatabase:
         album_genre = Genre(first[3], first[4])
         songs = list()
         for result in results:
+            if all(map(lambda r: r is None, result[4:8])):  # no songs
+                continue
             song_id = result[5]
             song_name = result[6]
-            songs.append(Song(song_id, song_name))
+            song_file = result[7]
+            songs.append(Song(song_id, song_name, song_file))
         return Album(album_id, album_name, album_genre, album_year, songs, cover=album_cover)
 
     def save_album(self, user_id, album):
@@ -125,16 +133,24 @@ class BlackLandDatabase:
         cur.execute("INSERT INTO albums (id, user_id, name, genre, year, cover) VALUES(?, ?, ?, ?, ?, ?)",
                     (album_id, user_id, album.get_name(),
                      album.get_genre().get_id(), album.get_year(), album.get_cover()))
-        cur.executemany("INSERT INTO songs (id, album_id, name) VALUES (?, ?, ?)",
-                        list(map(lambda s: (s.get_id(), album_id, s.get_name()), album.get_songs())))
+        cur.executemany("INSERT INTO songs (id, album_id, name, file) VALUES (?, ?, ?, ?)",
+                        list(map(lambda s: (s.get_id(), album_id, s.get_name(), s.get_file()), album.get_songs())))
         self.connection.commit()
 
     def load_genres(self):
         cur = self.connection.cursor()
         return list(map(lambda t: Genre(t[0], t[1]), cur.execute("SELECT * FROM genres").fetchall()))
 
+    def add_genres(self, *genres):
+        cur = self.connection.cursor()
+        # lol
+        cur.executemany("INSERT OR IGNORE INTO genres (name) VALUES (?)", list(map(lambda g: (g,), genres)))
+
     def shutdown(self):
         self.connection.close()
+
+    def user_editor(self, user):
+        return UserEditor(self.connection, user)
 
 
 class Editor:
@@ -149,7 +165,6 @@ class UserEditor(Editor):
 
     def __init__(self, connection, user):
         super().__init__(connection)
-        self.albums_to_delete = list()
         self.user = user
 
     def set_avatar(self, avatar):
@@ -160,17 +175,10 @@ class UserEditor(Editor):
         cursor = self.connection.cursor()
         cursor.execute("UPDATE users SET description=? WHERE id=?", (description, self.user.get_id()))
 
-    def remove_album(self, album):
-        self.albums_to_delete.append(album)
+    def remove_album(self, album_id):
         cursor = self.connection.cursor()
-        cursor.execute("DELETE FROM albums WHERE id=?", (album.get_id(),))
-        cursor.execute("DELETE FROM songs WHERE album_id=?", (album.get_id(),))
+        cursor.execute("DELETE FROM albums WHERE id=?", (album_id,))
+        cursor.execute("DELETE FROM songs WHERE album_id=?", (album_id,))
 
     def finish(self):
         super().finish()
-        for album in self.albums_to_delete:
-            album_folder = ALBUMS_FOLDER + f"album_{album.get_id()}/"
-            shutil.rmtree(album_folder)
-
-
-

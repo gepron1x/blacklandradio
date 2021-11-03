@@ -4,13 +4,13 @@ import sys
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QDialog, QGroupBox, QApplication
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QGroupBox, QApplication
 
 import util
 import os.path
 from database import BlackLandDatabase
 from util import IMAGE_EXTENSIONS, MUSIC_EXTENSIONS
-from user import DEFAULT_COVER, Genre, User, Album, Song
+from user import DEFAULT_COVER, Genre, Album, Song
 
 
 class SongCreation(QGroupBox):
@@ -80,7 +80,6 @@ class AlbumCreationWindow(QMainWindow):
 
     def finish(self):
         album_id = util.random_id()
-        album_directory = f"./albums/album_{album_id}"
         name = self.name_input.text()
         year = self.year_input.text()
         genre = self.genres_by_name[self.genres_combobox.currentText()]
@@ -108,8 +107,7 @@ class AlbumCreationWindow(QMainWindow):
                 self.statusBar().showMessage(f"У песни {song_name} файл не существует, либо он вовсе не указан.")
                 return
             song_id = util.random_id()
-            songs.append(Song(song_id, song_name))
-            util.copy_file(song_file, f"{album_directory}/track_{song_id}.mp3")
+            songs.append(Song(song_id, song_name, song_file))
         album = Album(album_id, name, genre, int(year), songs, cover=self.album_cover)
         self.database.save_album(self.user.get_id(), album)
         self.close()

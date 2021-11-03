@@ -156,6 +156,19 @@
      <string>Обновить</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="add_genre_button">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>230</y>
+      <width>121</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Добавить жанр</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

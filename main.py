@@ -9,10 +9,8 @@ from album_widget import MiniAlbumWidget
 from auth import AuthWidget
 from database import BlackLandDatabase
 from album_window import AlbumWindow
-from user_window import UserWindow
+from user_window import UserEditorWindow
 from util import WindowHolder
-
-ALBUMS_FOLDER = "./albums/"
 
 
 class MainPage(QMainWindow, WindowHolder):
@@ -28,17 +26,26 @@ class MainPage(QMainWindow, WindowHolder):
         self.account_value.setText(self.user.get_username())
         self.add_album_button.clicked.connect(self.create_album)
         self.update_albums()
-        self.update_button.clicked.connect(self.update_albums)
+        self.update_button.clicked.connect(self.update)
         self.my_profile_button.clicked.connect(self.open_profile)
 
     def open_album(self, template):
         album = self.database.load_album(template.get_id())
-        window = AlbumWindow(template.get_username(), album)
+        window = AlbumWindow(template.get_username(), album, self.database)
         self.open_window(window)
 
     def open_profile(self):
-        window = UserWindow(self.user)
+        window = UserEditorWindow(self.user, self.database)
+        window.closed.connect(self.update)
         self.open_window(window)
+
+    def update(self):
+        self.update_user()
+        self.update_albums()
+
+    def update_user(self):
+        username = self.user.get_username()
+        self.user = self.database.load_user(username)
 
     def update_albums(self):
         self.clear_albums()
@@ -55,6 +62,7 @@ class MainPage(QMainWindow, WindowHolder):
 
     def create_album(self):
         window = AlbumCreationWindow(self.user, self.database)
+        window.closed.connect(self.update)
         self.open_window(window)
 
     def closeEvent(self, event):
@@ -64,6 +72,8 @@ class MainPage(QMainWindow, WindowHolder):
 class BlackLandRadio:
     def __init__(self):
         self.database = BlackLandDatabase(sqlite3.connect("blackland.db"))
+        self.database.initialize()
+        self.database.add_genres("Фонк", "Тред", "Рок")
         self.auth_window = AuthWidget(self.database)
         self.auth_window.show()
         self.main_page = None

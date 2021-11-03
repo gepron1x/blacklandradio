@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import uic, QtMultimedia, QtCore
 
-from util import Closable
+from util import Closable, WindowHolder
 
 
 def format_timedelta(delta):
@@ -13,22 +13,24 @@ def format_timedelta(delta):
     return f"{minutes:02d}:{seconds:02d}"
 
 
-class AlbumWindow(QWidget, Closable):
+class AlbumWindow(QWidget, Closable, WindowHolder):
 
-    def __init__(self, username, album, parent=None):
-        super(AlbumWindow, self).__init__(parent)
+    def __init__(self, username, album, database):
+        super().__init__()
         uic.loadUi('ui/album.ui', self)
         self.playlist = QtMultimedia.QMediaPlaylist()
         self.current_index = 0
         self.player = QtMultimedia.QMediaPlayer()
         self.is_playing = False
         self.username = username
+        self.database = database
         self.album = album
         self.initUi()
 
     def initUi(self):
         self.album_name.setText(self.album.get_name())
         self.album_year.setText(str(self.album.get_year()))
+        self.album_genre.setText(self.album.get_genre().get_name())
         self.user_label.setText(self.username)
         pixmap = QPixmap(self.album.get_cover())
         self.album_cover.setPixmap(pixmap)
@@ -40,13 +42,12 @@ class AlbumWindow(QWidget, Closable):
         self.player.durationChanged.connect(self.duration_changed)
         self.next_button.clicked.connect(self.next)
         self.prev_button.clicked.connect(self.previous)
+        self.profile_button.clicked.connect(self.open_profile)
 
     def load_tracks(self):
-        album_folder = QtCore.QDir.current().absolutePath() + "/albums/" + f"album_{self.album.album_id}/"
-
         songs = self.album.get_songs()
         for song in songs:
-            url = QtCore.QUrl.fromLocalFile(album_folder + f"track_{song.song_id}.mp3")
+            url = QtCore.QUrl.fromLocalFile(song.get_file())
             self.playlist.addMedia(QtMultimedia.QMediaContent(url))
             self.tracklist.addItem(song.get_name())
         self.choose_track(0)
@@ -67,6 +68,12 @@ class AlbumWindow(QWidget, Closable):
         self.play_button.setText("Play")
         self.player.pause()
         self.is_playing = False
+
+    def open_profile(self):
+        user = self.database.load_user(self.username)
+        from user_window import UserWindow
+        window = UserWindow(user, self.database)
+        self.open_window(window)
 
     def next(self):
         value = self.current_index + 1
