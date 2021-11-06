@@ -47,11 +47,5 @@ class WindowHolder(QObject):
         self.active_windows.remove(self.sender())
 
 
-def copy_file(file, destination):
-    os.makedirs(os.path.dirname(destination), exist_ok=True)
-    shutil.copyfile(file, destination)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+8 to toggle the breakpoint.

@@ -79,6 +79,13 @@ class Genre:
     def get_name(self):
         return self.name
 
+    def __str__(self):
+        return f"Genre {self.name} [" \
+               f"id: {self.genre_id}]"
+
+    def __hash__(self):
+        return hash((self.genre_id, self.name))
+
 
 class Album:
     def __init__(self, album_id, name, genre, year, songs, cover=DEFAULT_COVER):

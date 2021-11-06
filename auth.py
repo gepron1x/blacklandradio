@@ -1,12 +1,11 @@
-import sqlite3
-import sys
+
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5 import uic
 
 import util
-from user import User
+from api import User
 
 
 class AuthWidget(QMainWindow):

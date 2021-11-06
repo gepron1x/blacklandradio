@@ -1,11 +1,9 @@
-import sqlite3
-import sys
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGroupBox
 from PyQt5 import uic
-from user import AlbumTemplate
+from api import AlbumTemplate
 
 
 class MiniAlbumWidget(QGroupBox):
@@ -36,6 +34,4 @@ class MiniAlbumWidget(QGroupBox):
 
     def delete_pressed(self):
         self.delete.emit(self.album_template)
-
-
 

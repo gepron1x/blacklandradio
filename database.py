@@ -1,7 +1,7 @@
 import shutil
 
 
-from user import AlbumTemplate, Song, Album, User, Genre, DEFAULT_IMAGE_FILE
+from api import AlbumTemplate, Song, Album, User, Genre, DEFAULT_IMAGE_FILE
 
 
 class BlackLandDatabase:
@@ -62,10 +62,11 @@ class BlackLandDatabase:
     def load_user(self, username):
         cur = self.connection.cursor()
         rs = cur.execute("SELECT U.id, U.username, U.password, U.description, U.avatar, "
-                         "A.id, A.name, A.genre, A.year, A.cover, "
+                         "A.id, A.name, G.id, G.name, A.year, A.cover, "
                          "S.id, S.name, S.file "
                          "FROM users as U "
                          "LEFT JOIN albums as A ON U.id = A.user_id "
+                         "LEFT JOIN genres as G ON A.genre = G.id "
                          "LEFT JOIN songs as S ON A.id = S.album_id WHERE U.username=?",
                          (username,)).fetchall()
         if len(rs) == 0:
@@ -82,13 +83,13 @@ class BlackLandDatabase:
                 continue
             album_id = results[5]
             album_name = results[6]
-            album_genre = results[7]
-            album_year = results[8]
-            album_cover = results[9]
+            album_genre = Genre(results[7], results[8])
+            album_year = results[9]
+            album_cover = results[10]
 
-            song_id = results[10]
-            song_name = results[11]
-            song_file = results[12]
+            song_id = results[11]
+            song_name = results[12]
+            song_file = results[13]
 
             album = albums.get(album_id, None)
             if album is None:
@@ -145,6 +146,10 @@ class BlackLandDatabase:
         cur = self.connection.cursor()
         # lol
         cur.executemany("INSERT OR IGNORE INTO genres (name) VALUES (?)", list(map(lambda g: (g,), genres)))
+
+    def genre_exists(self, name):
+        cur = self.connection.cursor()
+        return len(cur.execute("SELECT * FROM genres WHERE name=?", (name,)).fetchall()) != 0
 
     def shutdown(self):
         self.connection.close()

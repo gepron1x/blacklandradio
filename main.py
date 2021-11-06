@@ -1,7 +1,7 @@
 import sqlite3
 import sys
 
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QInputDialog
 from PyQt5 import uic
 
 from album_creation import AlbumCreationWindow
@@ -26,6 +26,7 @@ class MainPage(QMainWindow, WindowHolder):
         self.account_value.setText(self.user.get_username())
         self.add_album_button.clicked.connect(self.create_album)
         self.update_albums()
+        self.add_genre_button.clicked.connect(self.add_genre)
         self.update_button.clicked.connect(self.update)
         self.my_profile_button.clicked.connect(self.open_profile)
 
@@ -64,6 +65,21 @@ class MainPage(QMainWindow, WindowHolder):
         window = AlbumCreationWindow(self.user, self.database)
         window.closed.connect(self.update)
         self.open_window(window)
+
+    def add_genre(self):
+        name, ok = QInputDialog.getText(self, "Создание жанра", "Введите название жанра")
+
+        if not ok:
+            return
+        if not name:
+            self.statusBar().showMessage("Название жанра не может быть пустым!")
+            return
+        if self.database.genre_exists(name):
+            self.statusBar().showMessage("Жанр с таким же названием уже существует!")
+            return
+
+        self.database.add_genres(name)
+        self.statusBar().showMessage("Жанр добавлен.")
 
     def closeEvent(self, event):
         self.database.shutdown()

@@ -10,7 +10,7 @@ import util
 import os.path
 from database import BlackLandDatabase
 from util import IMAGE_EXTENSIONS, MUSIC_EXTENSIONS
-from user import DEFAULT_COVER, Genre, Album, Song
+from api import DEFAULT_COVER, Genre, Album, Song
 
 
 class SongCreation(QGroupBox):
@@ -61,6 +61,7 @@ class AlbumCreationWindow(QMainWindow):
 
         self.genres_combobox.addItems(list(map(Genre.get_name, genres)))
         self.refresh_cover()
+        self.cancel_button.clicked.connect(self.cancel)
         self.choose_cover_button.clicked.connect(self.choose_cover)
         self.add_song_button.clicked.connect(self.add_song)
         self.create_album_button.clicked.connect(self.finish)
@@ -70,7 +71,6 @@ class AlbumCreationWindow(QMainWindow):
         self.cover.setPixmap(pixmap)
 
     def add_song(self):
-        print("hey")
         widget = SongCreation(parent=self.songs_contents)
         widget.deleted.connect(self.remove_song)
         self.songs_layout.addWidget(widget)

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QFileDialog, QMainWindow
 from PyQt5 import uic
 
 from album_widget import MiniAlbumWidget
-from user import AlbumTemplate
+from api import AlbumTemplate
 from album_window import AlbumWindow
 from util import Closable, WindowHolder, IMAGE_EXTENSIONS
 
