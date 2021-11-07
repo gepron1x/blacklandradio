@@ -6,7 +6,7 @@ from PyQt5 import uic
 
 from album_creation import AlbumCreationWindow
 from album_widget import MiniAlbumWidget
-from auth import AuthWidget
+from auth import AuthWindow
 from database import BlackLandDatabase
 from album_window import AlbumWindow
 from user_window import UserEditorWindow
@@ -89,8 +89,8 @@ class BlackLandRadio:
     def __init__(self):
         self.database = BlackLandDatabase(sqlite3.connect("blackland.db"))
         self.database.initialize()
-        self.database.add_genres("Фонк", "Тред", "Рок")
-        self.auth_window = AuthWidget(self.database)
+        self.database.add_genres("Рок", "Поп", "Хип-хоп", "Метал", "Эмбиент")
+        self.auth_window = AuthWindow(self.database)
         self.auth_window.show()
         self.main_page = None
         self.auth_window.finished.connect(self.open_main)

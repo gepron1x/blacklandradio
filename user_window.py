@@ -15,15 +15,15 @@ class AbstractUserWindow(QMainWindow, Closable, WindowHolder):
         self.user = user
         self.album_dict = dict()
 
-    def load_albums(self):
+    def load_albums(self, scroll_contents, scroll_layout):
         user_albums = self.user.get_albums()
         for album in user_albums:
             template = AlbumTemplate(album.get_id(), self.user.get_username(),
                                      album.get_name(), album.get_year(), album.get_cover())
             self.album_dict[template] = album
-            widget = self.create_album_widget(template, self.scrollContents)
+            widget = self.create_album_widget(template, scroll_contents)
             widget.listen.connect(self.open_album)
-            self.scrollLayout.addWidget(widget)
+            scroll_layout.addWidget(widget)
 
     def create_album_widget(self, template, parent):
         return MiniAlbumWidget(template, parent=parent)
@@ -47,7 +47,7 @@ class UserWindow(AbstractUserWindow):
         pixmap = QPixmap(self.user.get_avatar())
         self.pfp.setPixmap(pixmap)
         self.total_albums.setText(str(len(self.user.get_albums())))
-        self.load_albums()
+        self.load_albums(self.scrollContents, self.scrollLayout)
 
 
 class UserEditorWindow(AbstractUserWindow):
@@ -64,7 +64,7 @@ class UserEditorWindow(AbstractUserWindow):
         self.description.setPlainText(self.user.get_description())
         self.edit_description_button.clicked.connect(self.edit_description)
         self.edit_avatar_button.clicked.connect(self.edit_avatar)
-        self.load_albums()
+        self.load_albums(self.scrollContents, self.scrollLayout)
 
     def create_album_widget(self, template, parent):
         widget = MiniAlbumWidget(template, parent=parent, deletable=True)

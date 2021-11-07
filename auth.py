@@ -8,7 +8,7 @@ import util
 from api import User
 
 
-class AuthWidget(QMainWindow):
+class AuthWindow(QMainWindow):
     finished = pyqtSignal(User)
 
     def __init__(self, database):
