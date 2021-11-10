@@ -5,7 +5,7 @@ from PyQt5 import uic
 import util
 from api import User
 
-MIN_USERNAME_LEN, MAX_USERNAME_LEN = 4, 16
+MIN_USERNAME_LEN, MAX_USERNAME_LEN = 4, 40
 MIN_PASSWORD_LEN, MAX_PASSWORD_LEN = 8, 60
 
 

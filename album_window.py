@@ -116,4 +116,5 @@ class AlbumWindow(QWidget, Closable, WindowHolder):
 
     def closeEvent(self, event):
         super().closeEvent(event)
+        Closable.closeEvent(self, event)
         self.player.stop()
