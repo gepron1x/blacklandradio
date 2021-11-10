@@ -25,12 +25,12 @@
     </property>
     <property name="font">
      <font>
-      <family>a dripping marker</family>
-      <pointsize>48</pointsize>
+      <family>MS Shell Dlg 2</family>
+      <pointsize>28</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>Blvcklvnd Rvdix</string>
+     <string>Blackland Radio</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -53,8 +53,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>526</width>
-       <height>387</height>
+       <width>528</width>
+       <height>389</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -75,9 +75,9 @@
     </property>
     <property name="font">
      <font>
-      <pointsize>18</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">
@@ -103,7 +103,7 @@
       <x>20</x>
       <y>40</y>
       <width>161</width>
-      <height>18</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">

@@ -38,9 +38,9 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>210</y>
+      <y>190</y>
       <width>291</width>
-      <height>20</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -60,10 +60,10 @@
    <widget class="QLabel" name="login_label">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>350</x>
       <y>240</y>
-      <width>58</width>
-      <height>18</height>
+      <width>91</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
@@ -83,10 +83,10 @@
    <widget class="QLabel" name="password_label">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>340</x>
       <y>310</y>
-      <width>58</width>
-      <height>18</height>
+      <width>111</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
@@ -114,8 +114,8 @@
     </property>
     <property name="font">
      <font>
-      <family>a dripping marker</family>
-      <pointsize>72</pointsize>
+      <family>MS Shell Dlg 2</family>
+      <pointsize>28</pointsize>
      </font>
     </property>
     <property name="text">
@@ -128,9 +128,9 @@
    <widget class="QPushButton" name="login_button">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>240</x>
       <y>380</y>
-      <width>111</width>
+      <width>131</width>
       <height>34</height>
      </rect>
     </property>
@@ -141,9 +141,9 @@
    <widget class="QPushButton" name="register_button">
     <property name="geometry">
      <rect>
-      <x>447</x>
+      <x>427</x>
       <y>380</y>
-      <width>101</width>
+      <width>131</width>
       <height>34</height>
      </rect>
     </property>

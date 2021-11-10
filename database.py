@@ -1,6 +1,5 @@
 import shutil
 
-
 from api import AlbumTemplate, Song, Album, User, Genre, DEFAULT_IMAGE_FILE
 
 
@@ -158,12 +157,27 @@ class BlackLandDatabase:
         return UserEditor(self.connection, user)
 
 
+class Update:
+    def __init__(self, sql, *params):
+        self.sql = sql
+        self.params = params
+
+    def execute(self, cursor):
+        cursor.execute(self.sql, tuple(self.params))
+
+
 class Editor:
     def __init__(self, connection):
+        self.updates = list()
         self.connection = connection
 
+    def add_update(self, update):
+        self.updates.append(update)
+
     def finish(self):
-        self.connection.commit()
+        cur = self.connection.cursor()
+        for update in self.updates:
+            update.execute(cur)
 
 
 class UserEditor(Editor):
@@ -173,17 +187,11 @@ class UserEditor(Editor):
         self.user = user
 
     def set_avatar(self, avatar):
-        cursor = self.connection.cursor()
-        cursor.execute("UPDATE users SET avatar=? WHERE id=?", (avatar, self.user.get_id()))
+        self.add_update(Update("UPDATE users SET avatar=? WHERE id=?", avatar, self.user.get_id()))
 
     def set_description(self, description):
-        cursor = self.connection.cursor()
-        cursor.execute("UPDATE users SET description=? WHERE id=?", (description, self.user.get_id()))
+        self.add_update(Update("UPDATE users SET description=? WHERE id=?", description, self.user.get_id()))
 
     def remove_album(self, album_id):
-        cursor = self.connection.cursor()
-        cursor.execute("DELETE FROM albums WHERE id=?", (album_id,))
-        cursor.execute("DELETE FROM songs WHERE album_id=?", (album_id,))
-
-    def finish(self):
-        super().finish()
+        self.add_update(Update("DELETE FROM albums WHERE id=?", album_id))
+        self.add_update(Update("DELETE FROM songs WHERE album_id=?", album_id))

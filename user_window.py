@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget, QFileDialog, QMainWindow
+from PyQt5.QtWidgets import QFileDialog, QMainWindow
 from PyQt5 import uic
 
 from album_widget import MiniAlbumWidget
@@ -65,6 +65,8 @@ class UserEditorWindow(AbstractUserWindow):
         self.edit_description_button.clicked.connect(self.edit_description)
         self.edit_avatar_button.clicked.connect(self.edit_avatar)
         self.load_albums(self.scrollContents, self.scrollLayout)
+        self.save_button.clicked.connect(self.save)
+        self.cancel_button.clicked.connect(self.cancel)
 
     def create_album_widget(self, template, parent):
         widget = MiniAlbumWidget(template, parent=parent, deletable=True)
@@ -84,6 +86,12 @@ class UserEditorWindow(AbstractUserWindow):
         self.scrollLayout.removeWidget(self.sender())
         self.editor.remove_album(template.get_id())
 
+    def cancel(self):
+        self.close()
+
+    def save(self):
+        self.editor.finish()
+        self.close()
+
     def closeEvent(self, event):
         Closable.closeEvent(self, event)
-        self.editor.finish()
