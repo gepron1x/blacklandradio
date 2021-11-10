@@ -12,6 +12,8 @@ from album_window import AlbumWindow
 from user_window import UserEditorWindow
 from util import WindowHolder
 
+MAX_GENRE_NAME_LEN = 60
+
 
 class MainPage(QMainWindow, WindowHolder):
 
@@ -68,12 +70,15 @@ class MainPage(QMainWindow, WindowHolder):
 
     def add_genre(self):
         name, ok = QInputDialog.getText(self, "Создание жанра", "Введите название жанра")
-
         if not ok:
             return
+
         if not name:
             self.statusBar().showMessage("Название жанра не может быть пустым!")
             return
+
+        if len(name) > MAX_GENRE_NAME_LEN:
+            self.statusBar().showMessage(f"Название жанра не должно быть длинее {MAX_GENRE_NAME_LEN}!")
         if self.database.genre_exists(name):
             self.statusBar().showMessage("Жанр с таким же названием уже существует!")
             return

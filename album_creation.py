@@ -12,6 +12,8 @@ from database import BlackLandDatabase
 from util import IMAGE_EXTENSIONS, MUSIC_EXTENSIONS
 from api import DEFAULT_COVER, Genre, Album, Song
 
+MAX_NAME_LEN = 60
+
 
 class SongCreation(QGroupBox):
     deleted = pyqtSignal()
@@ -39,9 +41,7 @@ class SongCreation(QGroupBox):
         return self.file_input.text()
 
 
-class AlbumCreationWindow(QMainWindow):
-
-    closed = pyqtSignal()
+class AlbumCreationWindow(QMainWindow, util.Closable):
 
     def __init__(self, user, database):
         super().__init__()
@@ -84,8 +84,8 @@ class AlbumCreationWindow(QMainWindow):
         year = self.year_input.text()
         genre = self.genres_by_name[self.genres_combobox.currentText()]
 
-        if not name:
-            self.statusBar().showMessage("Название не может быть пустым!")
+        if not name or len(name) > MAX_NAME_LEN:
+            self.statusBar().showMessage(f"Название не может быть пустым и иметь размер более {MAX_NAME_LEN} символов!")
             return
 
         if not year.isdigit():
@@ -102,6 +102,8 @@ class AlbumCreationWindow(QMainWindow):
             if not song_name:
                 self.statusBar().showMessage("У песен должно быть название!")
                 return
+            if len(song_name) > MAX_NAME_LEN:
+                self.statusBar().showMessage(f"Название песен не должно быть больше {MAX_NAME_LEN} символов!")
             song_file = widget.get_file()
             if not os.path.isfile(song_file):
                 self.statusBar().showMessage(f"У песни {song_name} файл не существует, либо он вовсе не указан.")
@@ -120,15 +122,3 @@ class AlbumCreationWindow(QMainWindow):
             self, 'Выбрать картинку', '', IMAGE_EXTENSIONS)[0]
         self.refresh_cover()
 
-    def closeEvent(self, event):
-        self.closed.emit()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    connection = sqlite3.connect("blackland.db")
-    db = BlackLandDatabase(connection)
-    db.initialize()
-    ex = AlbumCreationWindow(db.load_user("Gepron1x"), db)
-    ex.show()
-    sys.exit(app.exec())
