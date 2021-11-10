@@ -99,6 +99,7 @@ class AlbumCreationWindow(QMainWindow, util.Closable):
 
         if year_integer > datetime.datetime.now().year:
             self.statusBar().showMessage("Вы из будущего? Введите настоящий год!")
+            return
 
         if not os.path.isfile(self.album_cover):
             self.statusBar().showMessage("Файла аватарки не существует!")
