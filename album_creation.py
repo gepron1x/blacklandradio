@@ -103,6 +103,10 @@ class AlbumCreationWindow(QMainWindow, util.Closable):
         if not os.path.isfile(self.album_cover):
             self.statusBar().showMessage("Файла аватарки не существует!")
             return
+        song_count = self.songs_layout.count()
+        if song_count == 0:
+            self.statusBar().showMessage("Добавьте хоть одну песню!")
+            return
 
         songs = list()
         for i in range(self.songs_layout.count()):
