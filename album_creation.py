@@ -4,11 +4,11 @@ import sys
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QGroupBox, QApplication
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QGroupBox
 
 import util
 import os.path
-from database import BlackLandDatabase
+import datetime
 from util import IMAGE_EXTENSIONS, MUSIC_EXTENSIONS
 from api import DEFAULT_COVER, Genre, Album, Song
 
@@ -91,6 +91,15 @@ class AlbumCreationWindow(QMainWindow, util.Closable):
         if not year.isdigit():
             self.statusBar().showMessage("Год может содержать только числа!")
             return
+        year_integer = int(year)
+
+        if year_integer < 1000:
+            self.statusBar().showMessage("Вы писали музыку в каменном веке? Введите настоящий год! :)")
+            return
+
+        if year_integer > datetime.datetime.now().year:
+            self.statusBar().showMessage("Вы из будущего? Введите настоящий год!")
+
         if not os.path.isfile(self.album_cover):
             self.statusBar().showMessage("Файла аватарки не существует!")
             return
@@ -121,4 +130,3 @@ class AlbumCreationWindow(QMainWindow, util.Closable):
         self.album_cover = QFileDialog.getOpenFileName(
             self, 'Выбрать картинку', '', IMAGE_EXTENSIONS)[0]
         self.refresh_cover()
-
