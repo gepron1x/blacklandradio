@@ -178,6 +178,7 @@ class Editor:
         cur = self.connection.cursor()
         for update in self.updates:
             update.execute(cur)
+        self.connection.commit()
 
 
 class UserEditor(Editor):
