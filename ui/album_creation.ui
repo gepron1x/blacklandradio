@@ -73,6 +73,9 @@
     <property name="text">
      <string/>
     </property>
+    <property name="maxLength">
+     <number>40</number>
+    </property>
    </widget>
    <widget class="QLabel" name="name_label">
     <property name="geometry">
@@ -111,6 +114,9 @@
     </property>
     <property name="text">
      <string/>
+    </property>
+    <property name="maxLength">
+     <number>4</number>
     </property>
    </widget>
    <widget class="QLabel" name="genre_label">
@@ -221,8 +227,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>359</width>
-       <height>399</height>
+       <width>357</width>
+       <height>397</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">

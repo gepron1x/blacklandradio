@@ -43,13 +43,13 @@
     <rect>
      <x>130</x>
      <y>20</y>
-     <width>301</width>
+     <width>351</width>
      <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>16</pointsize>
+     <pointsize>10</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -83,7 +83,7 @@
     <rect>
      <x>130</x>
      <y>80</y>
-     <width>201</width>
+     <width>321</width>
      <height>18</height>
     </rect>
    </property>

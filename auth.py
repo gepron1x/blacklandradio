@@ -5,8 +5,8 @@ from PyQt5 import uic
 import util
 from api import User
 
-MIN_USERNAME_LEN, MAX_USERNAME_LEN = 4, 40
-MIN_PASSWORD_LEN, MAX_PASSWORD_LEN = 8, 60
+MIN_USERNAME_LEN = 4
+MIN_PASSWORD_LEN = 8
 
 
 class AuthWindow(QMainWindow):
@@ -47,14 +47,12 @@ class AuthWindow(QMainWindow):
     def check(self):
         username = self.login_input.text()
         password = self.password_input.text()
-        if MIN_PASSWORD_LEN < len(username) > MAX_PASSWORD_LEN:
-            self.statusBar().showMessage(f"Имя пользователя не должно быть короче {MIN_USERNAME_LEN}"
-                                         f" и не длинее {MAX_USERNAME_LEN} символов!")
+        if len(username) < MIN_USERNAME_LEN:
+            self.statusBar().showMessage(f"Имя пользователя не должно быть короче {MIN_USERNAME_LEN} символов!")
             return False
 
-        if MIN_PASSWORD_LEN < len(password) > MAX_PASSWORD_LEN:
-            self.statusBar().showMessage(f"Пароль не должен быть короче {MIN_PASSWORD_LEN}"
-                                         f"и не длинее {MAX_PASSWORD_LEN} символов!")
+        if len(password) < MIN_PASSWORD_LEN:
+            self.statusBar().showMessage(f"Пароль не должен быть короче {MIN_PASSWORD_LEN} символов!")
             return False
         return True
 

@@ -1,6 +1,6 @@
 import shutil
 
-from api import AlbumTemplate, Song, Album, User, Genre, DEFAULT_IMAGE_FILE
+from api import AlbumTemplate, Song, Album, User, Genre
 
 
 class BlackLandDatabase:
@@ -11,7 +11,7 @@ class BlackLandDatabase:
         cur = self.connection.cursor()
         cur.execute("CREATE TABLE IF NOT EXISTS users ("
                     "id INTEGER NOT NULL, "
-                    "username VARCHAR(40) NOT NULL UNIQUE,"
+                    "username VARCHAR(16) NOT NULL UNIQUE,"
                     "password VARCHAR(60) NOT NULL,"
                     "description TINYTEXT,"
                     "avatar TINYTEXT,"
@@ -20,7 +20,7 @@ class BlackLandDatabase:
         cur.execute("CREATE TABLE IF NOT EXISTS albums ("
                     "id INTEGER NOT NULL,"
                     "user_id INTEGER NOT NULL,"
-                    "name VARCHAR(60) NOT NULL,"
+                    "name VARCHAR(40) NOT NULL,"
                     "genre INTEGER NOT NULL,"
                     "year  INTEGER NOT NULL,"
                     "cover TINYTEXT,"
@@ -30,7 +30,7 @@ class BlackLandDatabase:
         cur.execute("CREATE TABLE IF NOT EXISTS songs ("
                     "id INTEGER NOT NULL,"
                     "album_id INTEGER NOT NULL,"
-                    "name VARCHAR(60),"
+                    "name VARCHAR(40),"
                     "file TINYTEXT NOT NULL,"
                     "PRIMARY KEY(id)"
                     ")")
