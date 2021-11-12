@@ -10,7 +10,7 @@ MIN_PASSWORD_LEN = 8
 
 
 class AuthWindow(QMainWindow):
-    finished = pyqtSignal(User)
+    finished = pyqtSignal(User)  # Сигнал, вызываемый по успешному окончанию авторизации
 
     def __init__(self, database):
         super().__init__()
@@ -31,7 +31,7 @@ class AuthWindow(QMainWindow):
             self.statusBar().showMessage("Аккаунт с таким именем уже существует!")
             return
         password = self.password_input.text()
-        self.database.create_account(User(util.random_id(), username, password, "", list()))
+        self.database.save_user(User(util.random_id(), username, password, "", list()))
         self.finish()
 
     def login(self):
@@ -44,6 +44,7 @@ class AuthWindow(QMainWindow):
             return
         self.finish()
 
+    # Проверяем валидность введенных данных
     def check(self):
         username = self.login_input.text()
         password = self.password_input.text()
@@ -57,4 +58,4 @@ class AuthWindow(QMainWindow):
         return True
 
     def finish(self):
-        self.finished.emit(self.database.load_user(self.login_input.text()))
+        self.finished.emit(self.database.load_user(self.login_input.text())) # Сигналим

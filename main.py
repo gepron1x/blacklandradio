@@ -15,6 +15,11 @@ from util import WindowHolder
 MAX_GENRE_NAME_LEN = 60
 
 
+# Говорят, хороший код не требует комментариев - в нем все должно быть просто и интуитивно даже без них
+# Как бы мне не было лень их писать, видимо придется, спорить не буду ;)
+
+
+# Окно главной страницы
 class MainPage(QMainWindow, WindowHolder):
 
     def __init__(self, user, database):
@@ -90,15 +95,16 @@ class MainPage(QMainWindow, WindowHolder):
         self.database.shutdown()
 
 
+# Главный класс программы, управляющий авторизацией
 class BlackLandRadio:
     def __init__(self):
-        self.database = BlackLandDatabase(sqlite3.connect("blackland.db"))
+        self.database = BlackLandDatabase(sqlite3.connect("blackland.db"))  # Инициализируем бд
         self.database.initialize()
-        self.database.add_genres("Рок", "Поп", "Хип-хоп", "Метал", "Эмбиент")
+        self.database.add_genres("Рок", "Поп", "Хип-хоп", "Метал", "Эмбиент")  # Добавляем дефолтные жанры
         self.auth_window = AuthWindow(self.database)
         self.auth_window.show()
         self.main_page = None
-        self.auth_window.finished.connect(self.open_main)
+        self.auth_window.finished.connect(self.open_main)  # по окончанию авторизации открываем главное окно
 
     def open_main(self, user):
         self.main_page = MainPage(user, self.database)

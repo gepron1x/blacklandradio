@@ -8,6 +8,7 @@ from album_window import AlbumWindow
 from util import Closable, WindowHolder, IMAGE_EXTENSIONS
 
 
+# Общий код для окон профиля.
 class AbstractUserWindow(QMainWindow, Closable, WindowHolder):
     def __init__(self, user, database):
         super().__init__()
@@ -15,6 +16,7 @@ class AbstractUserWindow(QMainWindow, Closable, WindowHolder):
         self.user = user
         self.album_dict = dict()
 
+    # Отображает список альбомов на окне
     def load_albums(self, scroll_contents, scroll_layout):
         user_albums = self.user.get_albums()
         for album in user_albums:
@@ -25,6 +27,7 @@ class AbstractUserWindow(QMainWindow, Closable, WindowHolder):
             widget.listen.connect(self.open_album)
             scroll_layout.addWidget(widget)
 
+    # Для создания виджетов
     def create_album_widget(self, template, parent):
         return MiniAlbumWidget(template, parent=parent)
 
@@ -34,6 +37,7 @@ class AbstractUserWindow(QMainWindow, Closable, WindowHolder):
         self.open_window(window)
 
 
+# Окно страницы пользователя
 class UserWindow(AbstractUserWindow):
 
     def __init__(self, user, database):
@@ -50,6 +54,7 @@ class UserWindow(AbstractUserWindow):
         self.load_albums(self.scrollContents, self.scrollLayout)
 
 
+# Окно редактора профиля
 class UserEditorWindow(AbstractUserWindow):
 
     def __init__(self, user, database):
@@ -92,6 +97,3 @@ class UserEditorWindow(AbstractUserWindow):
     def save(self):
         self.editor.finish()
         self.close()
-
-    def closeEvent(self, event):
-        Closable.closeEvent(self, event)

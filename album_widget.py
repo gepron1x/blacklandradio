@@ -1,4 +1,3 @@
-
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGroupBox
@@ -6,9 +5,10 @@ from PyQt5 import uic
 from api import AlbumTemplate
 
 
+# Мини-Виджет альбома, используется в списках
 class MiniAlbumWidget(QGroupBox):
-    listen = pyqtSignal(AlbumTemplate)
-    delete = pyqtSignal(AlbumTemplate)
+    listen = pyqtSignal(AlbumTemplate)  # Если нажата кнопка "Слушать"
+    delete = pyqtSignal(AlbumTemplate)  # Если нажата кнопка "Удалить"
 
     def __init__(self, album_template, deletable=False, parent=None):
         super().__init__(parent)
@@ -34,4 +34,3 @@ class MiniAlbumWidget(QGroupBox):
 
     def delete_pressed(self):
         self.delete.emit(self.album_template)
-

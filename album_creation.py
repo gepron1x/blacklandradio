@@ -15,8 +15,9 @@ from api import DEFAULT_COVER, Genre, Album, Song
 MAX_NAME_LEN = 60
 
 
+# Виджет создания песни
 class SongCreation(QGroupBox):
-    deleted = pyqtSignal()
+    deleted = pyqtSignal()  # Сигнал вызывется если нажата кнопка удаления
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -41,6 +42,7 @@ class SongCreation(QGroupBox):
         return self.file_input.text()
 
 
+# Окно создания альбома
 class AlbumCreationWindow(QMainWindow, util.Closable):
 
     def __init__(self, user, database):
@@ -50,7 +52,7 @@ class AlbumCreationWindow(QMainWindow, util.Closable):
         self.genres_by_name = {}
         self.album_cover = DEFAULT_COVER
         self.album_name = ""
-        self.year = -1
+        self.year = -1  # ...
         self.database = database
         self.initUi()
 
@@ -84,6 +86,8 @@ class AlbumCreationWindow(QMainWindow, util.Closable):
         year = self.year_input.text()
         genre = self.genres_by_name[self.genres_combobox.currentText()]
 
+        # Провярем, все ли верно
+
         if not name or len(name) > MAX_NAME_LEN:
             self.statusBar().showMessage(f"Название не может быть пустым и иметь размер более {MAX_NAME_LEN} символов!")
             return
@@ -109,10 +113,13 @@ class AlbumCreationWindow(QMainWindow, util.Closable):
             self.statusBar().showMessage("Добавьте хоть одну песню!")
             return
 
+        # Добавляем песни
+
         songs = list()
         for i in range(self.songs_layout.count()):
             widget = self.songs_layout.itemAt(i).widget()
             song_name = widget.get_song_name()
+            # Снова защита от Ольги Александровны
             if not song_name:
                 self.statusBar().showMessage("У песен должно быть название!")
                 return

@@ -1,10 +1,4 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-import os
 from random import randint
-import shutil
 
 from PyQt5.QtCore import pyqtSignal, QObject
 
@@ -14,18 +8,12 @@ ID_MIN = 0
 ID_MAX = 2_147_483_647
 
 
-def random_string(alphabet, length):
-    s = ""
-    i_len = len(alphabet) - 1
-    for i in range(length):
-        s += alphabet[randint(0, i_len)]
-    return s
-
-
+# Рандомные id для альбомов, песен и пользователей
 def random_id():
     return randint(ID_MIN, ID_MAX)
 
 
+# Окно, которое при закрытии вызывает сигнал closed
 class Closable:
     closed = pyqtSignal()
 
@@ -33,6 +21,12 @@ class Closable:
         self.closed.emit()
 
 
+# Окно, в котором можно открывать другие окна.
+# Из-за того, как работает python, объекты окон приходится сохранять,
+# В противном случае они будут удалены очистителем мусора
+# И тупо не откроются.
+# Данный вспомогательный класс решает эту проблему.
+# Каждое открытое окно сохраняется в список и удаляется по закрытию.
 class WindowHolder(QObject):
     def __init__(self):
         super().__init__()
@@ -45,7 +39,3 @@ class WindowHolder(QObject):
 
     def remove_active(self):
         self.active_windows.remove(self.sender())
-
-
-
-

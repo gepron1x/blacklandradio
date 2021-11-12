@@ -1,9 +1,9 @@
-
-
 DEFAULT_IMAGE_FILE = "default_pfp.jpg"
 DEFAULT_COVER = "default_cover.jpg"
 
 
+# Классы API, Для работы с результатами запросов в бд
+# Пользователь
 class User:
 
     def __init__(self, user_id, username, password, description, albums, avatar=DEFAULT_IMAGE_FILE):
@@ -44,6 +44,7 @@ class User:
                      self.avatar, self.albums))
 
 
+# Песня
 class Song:
     def __init__(self, song_id, name, file):
         self.song_id = song_id
@@ -68,6 +69,7 @@ class Song:
         return hash((self.song_id, self.name, self.file))
 
 
+# Жанр
 class Genre:
     def __init__(self, genre_id, name):
         self.genre_id = genre_id
@@ -87,6 +89,7 @@ class Genre:
         return hash((self.genre_id, self.name))
 
 
+# Альбом
 class Album:
     def __init__(self, album_id, name, genre, year, songs, cover=DEFAULT_COVER):
         self.album_id = album_id
@@ -128,6 +131,7 @@ class Album:
         return hash((self.album_id, self.name, self.cover, self.genre))
 
 
+# Неполная информация о альбоме. Используется на главной странице, чтобы не загружать все альбомы сразу
 class AlbumTemplate:
     def __init__(self, album_id, username, name, year, cover):
         self.username = username
@@ -154,3 +158,10 @@ class AlbumTemplate:
     def __hash__(self):
         return hash((self.album_id, self.username, self.name, self.year, self.cover))
 
+    def __str__(self):
+        return f"AlbumTemplate [" \
+               f"album_id: {self.album_id}," \
+               f"username: {self.username}," \
+               f"name: {self.name}," \
+               f"year: {self.year}," \
+               f"cover: {self.cover}]"

@@ -1,14 +1,14 @@
-import shutil
-
 from api import AlbumTemplate, Song, Album, User, Genre
 
 
+# Простая работа с базой данных
 class BlackLandDatabase:
     def __init__(self, connection):
         self.connection = connection
 
     def initialize(self):
         cur = self.connection.cursor()
+        # Создаем таблицы
         cur.execute("CREATE TABLE IF NOT EXISTS users ("
                     "id INTEGER NOT NULL, "
                     "username VARCHAR(16) NOT NULL UNIQUE,"
@@ -41,25 +41,30 @@ class BlackLandDatabase:
                     ")")
         self.connection.commit()
 
+    # Существует ли аккаунт?
     def account_exists(self, username):
         cur = self.connection.cursor()
         rs = cur.execute("SELECT * FROM users WHERE username=?", (username,)).fetchall()
         return len(rs) != 0
 
-    def create_account(self, user):
+    # Сохранение аккаунта
+    def save_user(self, user):
         cur = self.connection.cursor()
         cur.execute("INSERT INTO users(id, username, password, description, avatar) VALUES (?, ?, ?, ?, ?)",
                     (user.get_id(), user.get_username(), user.get_password(),
                      user.get_description(), user.get_avatar()))
         self.connection.commit()
 
+    # Проверка пароля
     def check_password(self, username, password):
         cur = self.connection.cursor()
         rs = cur.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password)).fetchall()
         return len(rs) != 0
 
+    # Загрузка пользователя
     def load_user(self, username):
         cur = self.connection.cursor()
+        # Даже с джоинами громоздко!
         rs = cur.execute("SELECT U.id, U.username, U.password, U.description, U.avatar, "
                          "A.id, A.name, G.id, G.name, A.year, A.cover, "
                          "S.id, S.name, S.file "
@@ -78,7 +83,7 @@ class BlackLandDatabase:
         avatar = first[4]
         albums = {}
         for results in rs:
-            if all(map(lambda r: r is None, results[5:12])):  # it seems that user don't have any albums
+            if all(map(lambda r: r is None, results[5:12])):  # У пользователя нету альбомов, пропускаем
                 continue
             album_id = results[5]
             album_name = results[6]
@@ -98,12 +103,14 @@ class BlackLandDatabase:
 
         return User(user_id, username, password, description, list(albums.values()), avatar=avatar)
 
+    # Загрузка образов альбомов
     def load_album_templates(self):
         cur = self.connection.cursor()
         results = cur.execute("SELECT A.id, U.username, A.name, A.year, A.cover "
                               "FROM albums as A JOIN users AS U ON A.user_id = U.id").fetchall()
         return list(map(lambda r: AlbumTemplate(r[0], r[1], r[2], r[3], r[4]), results))
 
+    # Загрузка альбома
     def load_album(self, album_id):
         cur = self.connection.cursor()
         results = cur.execute("SELECT A.name, A.year, A.cover, G.id, G.name, S.id, S.name, S.file "
@@ -119,7 +126,7 @@ class BlackLandDatabase:
         album_genre = Genre(first[3], first[4])
         songs = list()
         for result in results:
-            if all(map(lambda r: r is None, result[4:8])):  # no songs
+            if all(map(lambda r: r is None, result[4:8])):  # В альбоме нету песен!
                 continue
             song_id = result[5]
             song_name = result[6]
@@ -127,6 +134,7 @@ class BlackLandDatabase:
             songs.append(Song(song_id, song_name, song_file))
         return Album(album_id, album_name, album_genre, album_year, songs, cover=album_cover)
 
+    # Сохраняем альбом
     def save_album(self, user_id, album):
         cur = self.connection.cursor()
         album_id = album.get_id()
@@ -137,26 +145,33 @@ class BlackLandDatabase:
                         list(map(lambda s: (s.get_id(), album_id, s.get_name(), s.get_file()), album.get_songs())))
         self.connection.commit()
 
+    # Загрузка жанров
     def load_genres(self):
         cur = self.connection.cursor()
         return list(map(lambda t: Genre(t[0], t[1]), cur.execute("SELECT * FROM genres").fetchall()))
 
+    # Добавляем жанры, если они не сущесвтует
     def add_genres(self, *genres):
         cur = self.connection.cursor()
         # lol
         cur.executemany("INSERT OR IGNORE INTO genres (name) VALUES (?)", list(map(lambda g: (g,), genres)))
+        self.connection.commit()
 
+    # Существует ли жанр?
     def genre_exists(self, name):
         cur = self.connection.cursor()
         return len(cur.execute("SELECT * FROM genres WHERE name=?", (name,)).fetchall()) != 0
 
+    # Выключаем бд
     def shutdown(self):
         self.connection.close()
 
+    # Создание редактора пользователя
     def user_editor(self, user):
         return UserEditor(self.connection, user)
 
 
+# Обновление бд, которое можно сохранить или испольнить позже
 class Update:
     def __init__(self, sql, *params):
         self.sql = sql
@@ -166,6 +181,7 @@ class Update:
         cursor.execute(self.sql, tuple(self.params))
 
 
+# Редактор бд. Обновления, в него добавленные исполняются только после вызова метода finish
 class Editor:
     def __init__(self, connection):
         self.updates = list()
@@ -181,6 +197,7 @@ class Editor:
         self.connection.commit()
 
 
+# Редактор пользователя
 class UserEditor(Editor):
 
     def __init__(self, connection, user):

@@ -7,17 +7,20 @@ from PyQt5 import uic, QtMultimedia, QtCore
 from util import Closable, WindowHolder
 
 
+# Получаем красивое время
 def format_timedelta(delta):
     minutes = delta.seconds // 60
     seconds = delta.seconds - minutes * 60
     return f"{minutes:02d}:{seconds:02d}"
 
 
+# Окно проигрывателя
 class AlbumWindow(QWidget, Closable, WindowHolder):
 
     def __init__(self, username, album, database):
         super().__init__()
         uic.loadUi('ui/album.ui', self)
+        # Здесь начинается магия с QtMultimedia
         self.playlist = QtMultimedia.QMediaPlaylist()
         self.current_index = 0
         self.player = QtMultimedia.QMediaPlayer()
@@ -36,14 +39,23 @@ class AlbumWindow(QWidget, Closable, WindowHolder):
         self.album_cover.setPixmap(pixmap)
         self.play_button.clicked.connect(self.play_resume)
         self.load_tracks()
+        # Меняем позицию плеера если пользователь дергает скролл
         self.progress_bar.valueChanged.connect(self.slider_value_changed)
+
+        # Обновляем скролл во время проигрывания
         self.player.positionChanged.connect(self.position_changed)
+
+        # Смена трека по выбору в списке
         self.tracklist.currentRowChanged.connect(self.track_chosen)
+
+        # Обновляем длительность
         self.player.durationChanged.connect(self.duration_changed)
+
         self.next_button.clicked.connect(self.next)
         self.prev_button.clicked.connect(self.previous)
         self.profile_button.clicked.connect(self.open_profile)
 
+    # Загружаем треки
     def load_tracks(self):
         songs = self.album.get_songs()
         for song in songs:
