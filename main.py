@@ -4,6 +4,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QInputDialog
 from PyQt5 import uic
 
+from about_application_window import InfoWindow
 from album_creation import AlbumCreationWindow
 from album_widget import MiniAlbumWidget
 from auth import AuthWindow
@@ -13,6 +14,7 @@ from user_window import UserEditorWindow
 from util import WindowHolder
 
 MAX_GENRE_NAME_LEN = 60
+HELP_FILE = "./help.txt"
 
 
 # Говорят, хороший код не требует комментариев - в нем все должно быть просто и интуитивно даже без них
@@ -36,6 +38,7 @@ class MainPage(QMainWindow, WindowHolder):
         self.add_genre_button.clicked.connect(self.add_genre)
         self.update_button.clicked.connect(self.update)
         self.my_profile_button.clicked.connect(self.open_profile)
+        self.about_application_button.clicked.connect(self.open_info)
 
     def open_album(self, template):
         album = self.database.load_album(template.get_id())
@@ -45,6 +48,10 @@ class MainPage(QMainWindow, WindowHolder):
     def open_profile(self):
         window = UserEditorWindow(self.user, self.database)
         window.closed.connect(self.update)
+        self.open_window(window)
+
+    def open_info(self):
+        window = InfoWindow(HELP_FILE)
         self.open_window(window)
 
     def update(self):
